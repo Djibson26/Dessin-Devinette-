@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jeu de dessin 🎨</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    canvas {
+      border: 2px solid #fff;
+      border-radius: 12px;
+      background: #222;
+      touch-action: none;
+    }
+    .buttons {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      background: #00c853;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #009624;
+    }
+    button.clear {
+      background: #e53935;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎨 Dessine ton mot</h1>
+  <canvas id="canvas" width="300" height="300"></canvas>
+
+  <div class="buttons">
+    <button class="clear" id="clearBtn">Effacer</button>
+    <button id="downloadBtn">Télécharger le dessin</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    function startDrawing(e) {
+      drawing = true;
+      draw(e);
+    }
+
+    function stopDrawing() {
+      drawing = false;
+      ctx.beginPath();
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.touches ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+      const y = e.touches ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'white';
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+
+    // Événements pour souris et tactile
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('touchmove', draw);
+
+    // Effacer le canevas
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    // Télécharger le dessin
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const image = canvas.toDataURL('image/png'); // transforme le canvas en image
+      const link = document.createElement('a');    // crée un lien temporaire
+      link.href = image;
+      link.download = 'dessin.png';                // nom du fichier
+      link.click();                                // déclenche le téléchargement
+    });
+  </script>
+
+</body>
+</html>
